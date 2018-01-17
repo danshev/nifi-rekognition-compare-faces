@@ -44,6 +44,7 @@ import com.amazonaws.services.rekognition.model.CompareFacesMatch;
 import com.amazonaws.services.rekognition.model.CompareFacesRequest;
 import com.amazonaws.services.rekognition.model.CompareFacesResult;
 import com.amazonaws.services.rekognition.model.Image;
+import com.amazonaws.services.rekognition.model.InvalidParameterException;
 import com.amazonaws.services.rekognition.model.InvalidS3ObjectException;
 import com.amazonaws.services.rekognition.model.S3Object;
 import com.amazonaws.util.Base64;
@@ -278,6 +279,15 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         }
         catch (InvalidS3ObjectException e) {
             getLogger().error("RekognitionCompareFacesProcessor: " + e.getRawResponseContent());
+        	session.transfer(flowFile, FAILURE);
+        }
+        catch (InvalidParameterException e) {
+            getLogger().error("RekognitionCompareFacesProcessor: " + e.getRawResponseContent());
+            getLogger().error("RekognitionCompareFacesProcessor: This can be caused by either the source or target having no faces.");
+        	session.transfer(flowFile, FAILURE);
+        }
+        catch (Exception e) {
+            getLogger().error("RekognitionCompareFacesProcessor: " + e.getMessage());
         	session.transfer(flowFile, FAILURE);
         }
     }
