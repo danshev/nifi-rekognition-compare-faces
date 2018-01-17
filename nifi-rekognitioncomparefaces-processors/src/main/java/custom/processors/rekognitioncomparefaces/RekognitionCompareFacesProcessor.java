@@ -44,6 +44,7 @@ import com.amazonaws.services.rekognition.model.CompareFacesMatch;
 import com.amazonaws.services.rekognition.model.CompareFacesRequest;
 import com.amazonaws.services.rekognition.model.CompareFacesResult;
 import com.amazonaws.services.rekognition.model.Image;
+import com.amazonaws.services.rekognition.model.InvalidS3ObjectException;
 import com.amazonaws.services.rekognition.model.S3Object;
 import com.amazonaws.util.Base64;
 import com.amazonaws.util.StringUtils;
@@ -154,6 +155,11 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
             .name("NO_MATCH")
             .description("No Match")
             .build();
+    
+    public static final Relationship FAILURE = new Relationship.Builder()
+            .name("FAILURE")
+            .description("Failure")
+            .build();
 
     private List<PropertyDescriptor> descriptors;
     
@@ -187,6 +193,7 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         final Set<Relationship> relationships = new HashSet<Relationship>();
         relationships.add(MATCH);
         relationships.add(NO_MATCH);
+        relationships.add(FAILURE);
         this.relationships = Collections.unmodifiableSet(relationships);
     }
 
@@ -250,19 +257,28 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
                     .withSourceImage(new Image().withS3Object(new S3Object().withBucket(source_bucket).withName(source_bucket_key)))
                     .withTargetImage(new Image().withBytes(buf)).withSimilarityThreshold(80f);
         }
+
+        try {
         
-        CompareFacesResult response = client.compareFaces(request);
-        
-        List<CompareFacesMatch> faces = response.getFaceMatches();
-        
-        for (CompareFacesMatch f : faces) {
-        	
+        	CompareFacesResult response = client.compareFaces(request);
+
+            
+            List<CompareFacesMatch> faces = response.getFaceMatches();
+            
+            for (CompareFacesMatch f : faces) {
+            	
+            }
+            if (faces.size() > 0) {
+            	session.transfer(flowFile, MATCH);
+            }
+            else {
+            	session.transfer(flowFile, NO_MATCH);
+            }
+            
         }
-        if (faces.size() > 0) {
-        	session.transfer(flowFile, MATCH);
-        }
-        else {
-        	session.transfer(flowFile, NO_MATCH);
+        catch (InvalidS3ObjectException e) {
+            getLogger().error("RekognitionCompareFacesProcessor: " + e.getRawResponseContent());
+        	session.transfer(flowFile, FAILURE);
         }
     }
 }
