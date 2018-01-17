@@ -71,9 +71,10 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
     
     public static final PropertyDescriptor S3_SECRET = new PropertyDescriptor
             .Builder().name("S3_SECRET")
-            .displayName("S3 Secret Key")
-            .description("S3 Secret Key for S3 Bucket")
+            .displayName("S3 Secret")
+            .description("S3 Secret for S3 Bucket")
             .required(true)
+            .sensitive(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
@@ -179,8 +180,8 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
 
     @OnScheduled
     public void onScheduled(final ProcessContext context) {
-        String key = context.getProperty(SOURCE_BASE64).getValue();
-        String secret = context.getProperty(SOURCE_BASE64).getValue();
+        String key = context.getProperty(S3_KEY).getValue();
+        String secret = context.getProperty(S3_SECRET).getValue();
         
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(key, secret);
         client = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
