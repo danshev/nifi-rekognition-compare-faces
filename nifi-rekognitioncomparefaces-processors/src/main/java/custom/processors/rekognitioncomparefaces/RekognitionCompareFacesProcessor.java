@@ -36,6 +36,8 @@ import org.apache.nifi.processor.util.StandardValidators;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.rekognition.AmazonRekognition;
 import com.amazonaws.services.rekognition.AmazonRekognitionClientBuilder;
 import com.amazonaws.services.rekognition.model.CompareFacesMatch;
@@ -53,6 +55,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 @Tags({"example"})
 @CapabilityDescription("Provide a description")
@@ -68,13 +71,22 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
             .required(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
-    
+
     public static final PropertyDescriptor S3_SECRET = new PropertyDescriptor
             .Builder().name("S3_SECRET")
             .displayName("S3 Secret")
             .description("S3 Secret for S3 Bucket")
             .required(true)
             .sensitive(true)
+            .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
+            .build();
+
+    public static final PropertyDescriptor REGION = new PropertyDescriptor
+            .Builder().name("REGION")
+            .displayName("Region")
+            .description("S3 Region")
+            .required(true)
+            .allowableValues(getRegions())
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
@@ -148,12 +160,22 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
     private static AmazonRekognition client = null;
 
     private Set<Relationship> relationships;
+    
+    private static Set<String> getRegions() {
+    	Set<String> regions = new TreeSet<String>();
+    	for (Regions r : Regions.values()) {
+    		regions.add(r.getName());
+    	}
+    	
+    	return regions;
+    }
 
     @Override
     protected void init(final ProcessorInitializationContext context) {
         final List<PropertyDescriptor> descriptors = new ArrayList<PropertyDescriptor>();
         descriptors.add(S3_KEY);
         descriptors.add(S3_SECRET);
+        descriptors.add(REGION);
         descriptors.add(SOURCE_BUCKET);
         descriptors.add(SOURCE_BUCKET_OBJECT_KEY);
         descriptors.add(TARGET_BUCKET);
@@ -182,9 +204,10 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
     public void onScheduled(final ProcessContext context) {
         String key = context.getProperty(S3_KEY).getValue();
         String secret = context.getProperty(S3_SECRET).getValue();
-        
+        String region = context.getProperty(REGION).getValue();
+                
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(key, secret);
-        client = AmazonRekognitionClientBuilder.standard().withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
+        client = AmazonRekognitionClientBuilder.standard().withRegion(region).withCredentials(new AWSStaticCredentialsProvider(awsCreds)).build();
         
     }
 
