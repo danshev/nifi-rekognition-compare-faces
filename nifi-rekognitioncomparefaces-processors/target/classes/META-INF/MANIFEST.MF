@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Implementation-Title: nifi-rekognitioncomparefaces-processors
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: Ronnie
+Specification-Vendor: Apache NiFi Project
+Specification-Title: nifi-rekognitioncomparefaces-processors
+Implementation-Vendor-Id: custom
+Build-Jdk: 1.8.0_131
+Specification-Version: 1.0
+Implementation-URL: http://nifi.apache.org/nifi-nar-bundles/nifi-rekog
+ nitioncomparefaces-bundle/nifi-rekognitioncomparefaces-processors
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Apache NiFi Project
+
