@@ -59,8 +59,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Tags({"example"})
-@CapabilityDescription("Provide a description")
+@Tags({"facial comparison rekognition"})
+@CapabilityDescription("Submits a pair of images - base64-encoded or S3 objects - to Amazon's Rekognition API")
 @SeeAlso({})
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
 @WritesAttributes({@WritesAttribute(attribute="", description="")})
@@ -102,10 +102,10 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor SOURCE_BUCKET_OBJECT_KEY = new PropertyDescriptor
-            .Builder().name("SOURCE_BUCKET_OBJECT_KEY")
-            .displayName("S3 Source Bucket Object Key")
-            .description("S3 Source Bucket Object Key")
+    public static final PropertyDescriptor SOURCE_IMAGE_OBJECT_KEY = new PropertyDescriptor
+            .Builder().name("SOURCE_IMAGE_OBJECT_KEY")
+            .displayName("S3 Source Image Object Key")
+            .description("S3 Source Image Object Key")
             .required(false)
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
@@ -120,46 +120,46 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor TARGET_BUCKET_OBJECT_KEY = new PropertyDescriptor
-            .Builder().name("TARGET_BUCKET_OBJECT_KEY")
-            .displayName("S3 Target Bucket Object Key")
-            .description("S3 Target Bucket Object Key")
+    public static final PropertyDescriptor TARGET_IMAGE_OBJECT_KEY = new PropertyDescriptor
+            .Builder().name("TARGET_IMAGE_OBJECT_KEY")
+            .displayName("S3 Target Image Object Key")
+            .description("S3 Target Image Object Key")
             .required(false)
             .expressionLanguageSupported(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
 
-    public static final PropertyDescriptor SOURCE_BASE64 = new PropertyDescriptor
-            .Builder().name("SOURCE_BASE64")
-            .displayName("Source Base64")
-            .description("Source Base64 from Attribute")
+    public static final PropertyDescriptor SOURCE_IMAGE_BASE64 = new PropertyDescriptor
+            .Builder().name("SOURCE_IMAGE_BASE64")
+            .displayName("Source Image Base64 Data")
+            .description("Source image as a Base64-encoded string")
             .expressionLanguageSupported(true)
             .required(false)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
-    public static final PropertyDescriptor TARGET_BASE64 = new PropertyDescriptor
-            .Builder().name("TARGET_BASE64")
-            .displayName("Target Base64")
-            .description("Target Base64 from Attribute")
+    public static final PropertyDescriptor TARGET_IMAGE_BASE64 = new PropertyDescriptor
+            .Builder().name("TARGET_IMAGE_BASE64")
+            .displayName("Target Image Base64 Data")
+            .description("Target image as a Base64-encoded string")
             .expressionLanguageSupported(true)
             .required(false)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
     public static final Relationship MATCH = new Relationship.Builder()
-            .name("MATCH")
+            .name("Match")
             .description("Match")
             .build();
     
     public static final Relationship NO_MATCH = new Relationship.Builder()
-            .name("NO_MATCH")
+            .name("No Match")
             .description("No Match")
             .build();
     
     public static final Relationship FAILURE = new Relationship.Builder()
-            .name("FAILURE")
+            .name("Failure")
             .description("Failure")
             .build();
 
@@ -185,11 +185,11 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         descriptors.add(S3_SECRET);
         descriptors.add(REGION);
         descriptors.add(SOURCE_BUCKET);
-        descriptors.add(SOURCE_BUCKET_OBJECT_KEY);
+        descriptors.add(SOURCE_IMAGE_OBJECT_KEY);
         descriptors.add(TARGET_BUCKET);
-        descriptors.add(TARGET_BUCKET_OBJECT_KEY);
-        descriptors.add(SOURCE_BASE64);
-        descriptors.add(TARGET_BASE64);
+        descriptors.add(TARGET_IMAGE_OBJECT_KEY);
+        descriptors.add(SOURCE_IMAGE_BASE64);
+        descriptors.add(TARGET_IMAGE_BASE64);
         this.descriptors = Collections.unmodifiableList(descriptors);
 
         final Set<Relationship> relationships = new HashSet<Relationship>();
@@ -228,12 +228,12 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         }
         
         String source_bucket = context.getProperty(SOURCE_BUCKET).evaluateAttributeExpressions(flowFile).getValue();
-        String source_bucket_key = context.getProperty(SOURCE_BUCKET_OBJECT_KEY).evaluateAttributeExpressions(flowFile).getValue();
+        String source_bucket_key = context.getProperty(SOURCE_IMAGE_OBJECT_KEY).evaluateAttributeExpressions(flowFile).getValue();
         String target_bucket = context.getProperty(TARGET_BUCKET).evaluateAttributeExpressions(flowFile).getValue();
-        String target_bucket_key = context.getProperty(TARGET_BUCKET_OBJECT_KEY).evaluateAttributeExpressions(flowFile).getValue();
+        String target_bucket_key = context.getProperty(TARGET_IMAGE_OBJECT_KEY).evaluateAttributeExpressions(flowFile).getValue();
 
-        String source_b64 = context.getProperty(SOURCE_BASE64).evaluateAttributeExpressions(flowFile).getValue();
-        String target_b64 = context.getProperty(TARGET_BASE64).evaluateAttributeExpressions(flowFile).getValue();
+        String source_b64 = context.getProperty(SOURCE_IMAGE_BASE64).evaluateAttributeExpressions(flowFile).getValue();
+        String target_b64 = context.getProperty(TARGET_IMAGE_BASE64).evaluateAttributeExpressions(flowFile).getValue();
         
         CompareFacesRequest request = null;
         
