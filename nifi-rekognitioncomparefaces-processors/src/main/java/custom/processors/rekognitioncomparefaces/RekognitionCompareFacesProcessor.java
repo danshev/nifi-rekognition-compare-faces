@@ -233,7 +233,7 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         String target_bucket_key = context.getProperty(TARGET_BUCKET_OBJECT_KEY).evaluateAttributeExpressions(flowFile).getValue();
 
         String source_b64 = context.getProperty(SOURCE_BASE64).evaluateAttributeExpressions(flowFile).getValue();
-        String target_b64 = context.getProperty(SOURCE_BASE64).evaluateAttributeExpressions(flowFile).getValue();
+        String target_b64 = context.getProperty(TARGET_BASE64).evaluateAttributeExpressions(flowFile).getValue();
         
         CompareFacesRequest request = null;
         
