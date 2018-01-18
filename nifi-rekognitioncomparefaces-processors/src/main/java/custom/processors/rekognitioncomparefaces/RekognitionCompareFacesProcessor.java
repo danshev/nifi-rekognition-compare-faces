@@ -71,6 +71,7 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
             .displayName("S3 Access Key")
             .description("S3 Access Key for S3 Bucket")
             .required(true)
+            .sensitive(true)
             .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
             .build();
 
@@ -242,7 +243,7 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
                     .withTargetImage(new Image().withS3Object(new S3Object().withBucket(target_bucket).withName(target_bucket_key))).withSimilarityThreshold(80f);
 
         }
-        else if (StringUtils.isNullOrEmpty(source_b64)) {
+        else if (!StringUtils.isNullOrEmpty(source_b64) && StringUtils.isNullOrEmpty(target_b64)) {
         	byte[] decoded = Base64.decode(source_b64);
         	ByteBuffer buf = ByteBuffer.wrap(decoded);
         	
@@ -250,13 +251,25 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
                     .withSourceImage(new Image().withBytes(buf))
                     .withTargetImage(new Image().withS3Object(new S3Object().withBucket(target_bucket).withName(target_bucket_key))).withSimilarityThreshold(80f);
         }
-        else if (StringUtils.isNullOrEmpty(target_b64)) {
+        else if (!StringUtils.isNullOrEmpty(target_b64) && StringUtils.isNullOrEmpty(source_b64)) {
         	byte[] decoded = Base64.decode(target_b64);
         	ByteBuffer buf = ByteBuffer.wrap(decoded);
         	
             request = new CompareFacesRequest()
                     .withSourceImage(new Image().withS3Object(new S3Object().withBucket(source_bucket).withName(source_bucket_key)))
                     .withTargetImage(new Image().withBytes(buf)).withSimilarityThreshold(80f);
+        }
+        else if (!StringUtils.isNullOrEmpty(target_b64) && !StringUtils.isNullOrEmpty(source_b64)) {
+        	byte[] decoded_target = Base64.decode(target_b64);
+        	ByteBuffer buf_target = ByteBuffer.wrap(decoded_target);
+        	
+        	byte[] decoded_source = Base64.decode(target_b64);
+        	ByteBuffer buf_source = ByteBuffer.wrap(decoded_source);
+
+        	
+            request = new CompareFacesRequest()
+                    .withSourceImage(new Image().withBytes(buf_source))
+                    .withTargetImage(new Image().withBytes(buf_target)).withSimilarityThreshold(80f);
         }
 
         try {
