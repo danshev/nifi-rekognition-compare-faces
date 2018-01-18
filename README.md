@@ -10,6 +10,8 @@ Apache NiFi processor for calling Amazon's "Compare Faces" Rekognition service.
 
 ## Configuration ##
 
+![Property Configuration](https://raw.githubusercontent.com/danshev/nifi-rekognition-compare-faces/master/property-config.png)
+
 After NiFi restarts and you've added the processor to your canvas ...
 
  1. Add your S3 credentials, just as you would with NiFi's FetchS3Object processor.
@@ -21,9 +23,4 @@ After NiFi restarts and you've added the processor to your canvas ...
   
   
   ### Notes ###
-  This processor was developed for a limited, go / no-go use-case.  
-  Currently, the processor simply checks whether the length of the FaceMatches
-  response is non-zero. If if is, then the FlowFile is routed to the `Matched`
-  relationship.  If no faces are found (throwing an InvalidParameters exception) 
-  or the FaceMatches response is empty, the FlowFile is routed to the `No Matches`
-  relationship.
+  This processor was developed for a limited, go / no-go use-case.  Currently, the processor simply checks whether the length of the [FaceMatches response array](https://docs.aws.amazon.com/rekognition/latest/dg/API_CompareFaces.html#API_CompareFaces_ResponseSyntax) is non-zero.  If if is, then the FlowFile is routed to the `Match` relationship.  If no faces are found (throwing an InvalidParameters exception) or the `FaceMatches` array is empty, the FlowFile is routed to the `No Match` relationship.
