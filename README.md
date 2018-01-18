@@ -24,3 +24,5 @@ After NiFi restarts and you've added the processor to your canvas ...
   
   ### Notes ###
   This processor was developed for a limited, go / no-go use-case.  Currently, the processor simply checks whether the length of the [FaceMatches response array](https://docs.aws.amazon.com/rekognition/latest/dg/API_CompareFaces.html#API_CompareFaces_ResponseSyntax) is non-zero.  If if is, then the FlowFile is routed to the `Match` relationship.  If no faces are found (throwing an InvalidParameters exception) or the `FaceMatches` array is empty, the FlowFile is routed to the `No Match` relationship.
+
+  To make the processor more general-purpose (merge requests welcome! please update the compiled NAR), a successful response could be JSONified and set as an attribute.  Thereafter, (the NiFi expression language)[https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html#jsonpath] (vs. the processor itself) could be employed for follow-on FlowFile routing. 
