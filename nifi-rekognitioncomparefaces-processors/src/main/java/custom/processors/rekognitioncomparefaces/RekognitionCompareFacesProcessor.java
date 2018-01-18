@@ -59,7 +59,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Tags({"facial comparison rekognition"})
+
+@Tags({"S3", "AWS", "Rekognition"})
 @CapabilityDescription("Submits a pair of images - base64-encoded or S3 objects - to Amazon's Rekognition API")
 @SeeAlso({})
 @ReadsAttributes({@ReadsAttribute(attribute="", description="")})
@@ -295,9 +296,9 @@ public class RekognitionCompareFacesProcessor extends AbstractProcessor {
         	session.transfer(flowFile, FAILURE);
         }
         catch (InvalidParameterException e) {
-            getLogger().error("RekognitionCompareFacesProcessor: " + e.getRawResponseContent());
-            getLogger().error("RekognitionCompareFacesProcessor: This can be caused by either the source or target having no faces.");
-        	session.transfer(flowFile, FAILURE);
+            //getLogger().error("RekognitionCompareFacesProcessor: " + e.getRawResponseContent());
+            //getLogger().error("RekognitionCompareFacesProcessor: This can be caused by either the source or target having no faces.");
+        	session.transfer(flowFile, NO_MATCH);
         }
         catch (Exception e) {
             getLogger().error("RekognitionCompareFacesProcessor: " + e.getMessage());
