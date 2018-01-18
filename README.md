@@ -5,7 +5,7 @@ Apache NiFi processor for calling Amazon's "Compare Faces" Rekognition service.
 ## Installation ##
 
  1. Download complied NAR into NiFi's `/lib/` directory.
- 2. Change permissions on the file (>`chmod 755 nifi-rekognitioncomparefaces-nar-1.0-SNAPSHOT.nar)
+ 2. Change permissions on the file (**>**`chmod 755 nifi-rekognitioncomparefaces-nar-1.0-SNAPSHOT.nar`)
  3. Restart NiFi (`/bin/nifi.sh restart`)
 
 ## Configuration ##
